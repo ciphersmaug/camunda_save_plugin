@@ -1,7 +1,6 @@
 import React, { Fragment, PureComponent } from 'camunda-modeler-plugin-helpers/react';
 import { Fill } from 'camunda-modeler-plugin-helpers/components';
 import classNames from 'classnames';
-
 export default class SavePlugin extends PureComponent {
   constructor(app) {
     super();
@@ -21,8 +20,6 @@ export default class SavePlugin extends PureComponent {
       });
       const file = await handle.getFile();
       const contents = await file.text();
-
-      debugger;
       // Write to the file.
       const writable = await handle.createWritable();
       await writable.write("Hello World");
@@ -31,16 +28,34 @@ export default class SavePlugin extends PureComponent {
     } catch (err) {
       if (err.name !== 'AbortError') {
         console.error(err.name, err.message);
+        debugger;
         return;
       }
     }
 
   }
 
+  async saveFile(){
+    // Test if the fileSystem seems to work at all...
+    var t = this.fileSystem.readFile("VERSION");
+    t.then((value) => {
+      console.log(value); // this Works, I seem to be able to read files.
+    });
+
+    var w = this.fileSystem.writeFile("./testfile.txt","MYTESTFILE");
+    w.then((value)=>{
+      debugger;
+    }).catch((err) => {
+      console.log(err);
+      debugger;
+    })
+  }
   // Attempt of using the FileSystem from the camunda modeler App.
   // Doesn't seem to work.
   async saveFile2(){
-    this.fileSystem.writeFile("~/TextFile.txt","Hello World",);
+    var buf = Buffer.from("Test 12345","utf-8")
+    this.fileSystem.writeFile("~/TextFile.txt",buf.buffer,{encoding:"utf8",filetype:".json"});
+    debugger;
   }
 
   render() {
@@ -49,7 +64,7 @@ export default class SavePlugin extends PureComponent {
         <button
           ref={ this._buttonRef }
           className={ classNames('btn') }
-          onClick={ () =>  this.saveFileThroughFilePicker()}>
+          onClick={ () =>  this.saveFile()}>
           Save as ... 
         </button>
       </Fill>
